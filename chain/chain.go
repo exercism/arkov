@@ -38,7 +38,21 @@ func wordCount() int {
 	return numbers[rand.Intn(len(numbers))]
 }
 
+func paragraphCount() int {
+	numbers := []int{1, 2, 2, 3, 3, 3, 4, 4, 5}
+	return numbers[rand.Intn(len(numbers))]
+}
+
 func (c *Chain) Generate() string {
+	n := paragraphCount()
+	paragraphs := make([]string, n, n)
+	for i := 0; i < n; i++ {
+		paragraphs = append(paragraphs, c.GenerateParagraph())
+	}
+	return strings.TrimLeft(strings.Join(paragraphs, "\n\n"), "\n ")
+}
+
+func (c *Chain) GenerateParagraph() string {
 	p := make(prefix, c.PrefixLen)
 	var words []string
 	n := wordCount()
