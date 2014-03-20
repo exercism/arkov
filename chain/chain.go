@@ -33,9 +33,15 @@ func (c *Chain) Build(r io.Reader) {
 	}
 }
 
-func (c *Chain) Generate(n int) string {
+func wordCount() int {
+	numbers := []int{13, 21, 34, 55, 89, 144}
+	return numbers[rand.Intn(len(numbers))]
+}
+
+func (c *Chain) Generate() string {
 	p := make(prefix, c.PrefixLen)
 	var words []string
+	n := wordCount()
 	for i := 0; i < n; i++ {
 		choices := c.Data[p.key()]
 		if len(choices) == 0 {

@@ -4,10 +4,10 @@ import (
 	"bufio"
 	"github.com/codegangsta/cli"
 	"github.com/exercism/arkov/chain"
+	"math/rand"
 	"os"
 	"strings"
 	"time"
-	"math/rand"
 )
 
 func main() {
@@ -48,12 +48,11 @@ func main() {
 			ShortName: "g",
 			Usage:     "generate a new comment",
 			Flags: []cli.Flag{
-				cli.IntFlag{"words, w", 100, "Maximum length of generated comment"},
 				cli.StringFlag{"infile, f", "", "File containing chain data"},
 			},
 			Action: func(c *cli.Context) {
 				markov := chain.FromFile(c.String("infile"))
-				text := markov.Generate(c.Int("words"))
+				text := markov.Generate()
 				println(text)
 			},
 		},
