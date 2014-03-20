@@ -52,11 +52,15 @@ func (c *Chain) Generate() string {
 	return strings.TrimLeft(strings.Join(paragraphs, "\n\n"), "\n ")
 }
 
+func completesSentence(s string) bool {
+	return strings.LastIndexAny(s, "?!.") == len(s)-1
+}
+
 func (c *Chain) GenerateParagraph() string {
 	p := make(prefix, c.PrefixLen)
 	var words []string
 	n := wordCount()
-	for i := 0; i < n; i++ {
+	for {
 		choices := c.Data[p.key()]
 		if len(choices) == 0 {
 			break
@@ -64,6 +68,9 @@ func (c *Chain) GenerateParagraph() string {
 		next := choices[rand.Intn(len(choices))]
 		words = append(words, next)
 		p.shift(next)
+		if len(choices) > n && completesSentence(next) {
+			break
+		}
 	}
 	return strings.Join(words, " ")
 }
