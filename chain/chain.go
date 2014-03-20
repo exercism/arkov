@@ -2,15 +2,17 @@ package chain
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"math/rand"
 	"strings"
 )
 
 type Chain struct {
 	Data      map[string][]string
-	PrefixLen int `json:"submission_path"`
+	PrefixLen int `json:"prefix_len"`
 }
 
 func NewChain(prefixLen int) *Chain {
@@ -44,4 +46,31 @@ func (c *Chain) Generate(n int) string {
 		p.shift(next)
 	}
 	return strings.Join(words, " ")
+}
+
+func (c Chain) ToFile(path string) {
+	bytes, err := json.Marshal(c)
+	if err != nil {
+		fmt.Printf("Failed to marshal: %v\n", err)
+	}
+
+	err = ioutil.WriteFile(path, bytes, 0644)
+	if err != nil {
+		fmt.Printf("Unable to write to %s: %v\n", path, err)
+	}
+}
+
+func FromFile(path string) (c Chain) {
+	bytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		fmt.Printf("Unable to read file: %s\n", path)
+		return
+	}
+
+	err = json.Unmarshal(bytes, &c)
+	if err != nil {
+		fmt.Printf("Cannot unmarshall: %v\n", err)
+		return
+	}
+	return
 }

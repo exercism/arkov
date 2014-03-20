@@ -2,34 +2,62 @@ package main
 
 import (
 	"bufio"
-	"strings"
-	"fmt"
-	"flag"
+	"github.com/codegangsta/cli"
 	"github.com/exercism/arkov/chain"
 	"os"
+	"strings"
 	"time"
 	"math/rand"
 )
 
 func main() {
-	numWords := flag.Int("words", 100, "maximum number of words to print")
-	prefixLen := flag.Int("prefix", 2, "prefix length in words")
-	filename := flag.String("file", "", "name of file to read from")
-
-	flag.Parse()
 	rand.Seed(time.Now().UnixNano())
 
-	c := chain.NewChain(*prefixLen)
+	app := cli.NewApp()
+	app.Name = "exercismarkov"
+	app.Usage = "Create fake exercism nitpicks"
 
-	file, err := os.Open(*filename)
-	if err != nil {
-		fmt.Println(err)
-		return
+	app.Commands = []cli.Command{
+		{
+			Name:      "build",
+			ShortName: "b",
+			Usage:     "build a markov chain",
+			Flags: []cli.Flag{
+				cli.StringFlag{"infile, f", "", "File containing original text"},
+				cli.StringFlag{"outfile, o", "", "File to store markov chain"},
+				cli.IntFlag{"prefix, p", 2, "Prefix length"},
+			},
+			Action: func(c *cli.Context) {
+				markov := chain.NewChain(c.Int("prefix"))
+
+				file, err := os.Open(c.String("infile"))
+				if err != nil {
+					println(err)
+					return
+				}
+				scanner := bufio.NewScanner(file)
+				for scanner.Scan() {
+					markov.Build(strings.NewReader(scanner.Text()))
+				}
+
+				markov.ToFile(c.String("outfile"))
+			},
+		},
+		{
+			Name:      "generate",
+			ShortName: "g",
+			Usage:     "generate a new comment",
+			Flags: []cli.Flag{
+				cli.IntFlag{"words, w", 100, "Maximum length of generated comment"},
+				cli.StringFlag{"infile, f", "", "File containing chain data"},
+			},
+			Action: func(c *cli.Context) {
+				markov := chain.FromFile(c.String("infile"))
+				text := markov.Generate(c.Int("words"))
+				println(text)
+			},
+		},
 	}
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		c.Build(strings.NewReader(scanner.Text()))
-	}
-	text := c.Generate(*numWords)
-	fmt.Println(text)
+
+	app.Run(os.Args)
 }
