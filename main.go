@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"github.com/codegangsta/cli"
 	"github.com/exercism/arkov/chain"
 	"math/rand"
@@ -53,7 +54,7 @@ func main() {
 			Action: func(c *cli.Context) {
 				markov := chain.FromFile(c.String("infile"))
 				text := markov.Generate()
-				println(text)
+				fmt.Println(text)
 			},
 		},
 	}
