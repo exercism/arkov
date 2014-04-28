@@ -10,25 +10,47 @@ import (
 	"strings"
 )
 
+// Chain contains sentence fragments that can be recombined.
 type Chain struct {
-	Data      map[string][]string
+	Nodes     []*Node
 	PrefixLen int `json:"prefix_len"`
 }
 
+type Node struct {
+	Key       string
+	Fragments []string
+}
+
 func NewChain(prefixLen int) *Chain {
-	return &Chain{make(map[string][]string), prefixLen}
+	return &Chain{[]*Node{}, prefixLen}
+}
+
+// FindNode locates the node with the given key.
+// If that node doesn't already exist, then a new node will
+// be created for that key before it is returned.
+func (c *Chain) FindNode(key string) *Node {
+	for _, n := range c.Nodes {
+		if n.Key == key {
+			return n
+		}
+	}
+	n := new(Node)
+	n.Key = key
+	c.Nodes = append(c.Nodes, n)
+	return n
 }
 
 func (c *Chain) Build(r io.Reader) {
 	br := bufio.NewReader(r)
-	p := make(prefix, c.PrefixLen)
+	p := prefix(make([]string, c.PrefixLen))
+	var s string
 	for {
-		var s string
 		if _, err := fmt.Fscan(br, &s); err != nil {
 			break
 		}
 		key := p.key()
-		c.Data[key] = append(c.Data[key], s)
+		node := c.FindNode(key)
+		node.Fragments = append(node.Fragments, s)
 		p.shift(s)
 	}
 }
@@ -58,10 +80,11 @@ func completesSentence(s string) bool {
 
 func (c *Chain) GenerateParagraph() string {
 	p := make(prefix, c.PrefixLen)
-	var words []string
 	n := wordCount()
+
+	var words []string
 	for {
-		choices := c.Data[p.key()]
+		choices := c.FindNode(p.key()).Fragments
 		if len(choices) == 0 {
 			break
 		}
