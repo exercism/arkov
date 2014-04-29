@@ -48,11 +48,10 @@ func (c *Chain) GenerateParagraph() string {
 
 	var words []string
 	for {
-		node := c.findNode(p.key())
-		if node == nil {
+		choices := c.fragmentsFor(p.key())
+		if choices == nil {
 			break
 		}
-		choices := node.Fragments
 		next := choices[rand.Intn(len(choices))]
 		words = append(words, next)
 		p.shift(next)
@@ -83,6 +82,14 @@ func (c *Chain) findNode(key string) *Node {
 		}
 	}
 	return nil
+}
+
+func (c *Chain) fragmentsFor(key string) []string {
+	node := c.findNode(key)
+	if node == nil {
+		return nil
+	}
+	return node.Fragments
 }
 
 func (c *Chain) appendFragment(key, fragment string) {

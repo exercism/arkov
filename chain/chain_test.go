@@ -38,7 +38,7 @@ func TestChain(t *testing.T) {
 		}
 
 		for _, node := range tt.nodes {
-			fragments := c.findNode(node.Key).Fragments
+			fragments := c.fragmentsFor(node.Key)
 
 			if !reflect.DeepEqual(node.Fragments, fragments) {
 				t.Fatalf("%v != %v", node.Fragments, fragments)
