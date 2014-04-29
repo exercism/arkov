@@ -16,11 +16,6 @@ type Chain struct {
 	PrefixLen int `json:"prefix_len"`
 }
 
-type Node struct {
-	Key       string
-	Fragments []string
-}
-
 func NewChain(prefixLen int) *Chain {
 	return &Chain{[]*Node{}, prefixLen}
 }
