@@ -105,7 +105,7 @@ func (c *Chain) GenerateParagraph() string {
 	return strings.Join(words, " ")
 }
 
-func (c Chain) ToFile(path string) {
+func (c *Chain) ToFile(path string) {
 	bytes, err := json.Marshal(c)
 	if err != nil {
 		fmt.Printf("Failed to marshal: %v\n", err)
