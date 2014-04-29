@@ -105,19 +105,21 @@ func NewChain(prefixLen int) *Chain {
 }
 
 // FromFile unmarshalls a stored JSON chain.
-func FromFile(path string) (c Chain) {
+func FromFile(path string) *Chain {
 	bytes, err := ioutil.ReadFile(path)
 	if err != nil {
 		fmt.Printf("Unable to read file: %s\n", path)
-		return
+		return nil
 	}
 
-	err = json.Unmarshal(bytes, &c)
+	c := new(Chain)
+
+	err = json.Unmarshal(bytes, c)
 	if err != nil {
 		fmt.Printf("Cannot unmarshall: %v\n", err)
-		return
+		return nil
 	}
-	return
+	return c
 }
 
 func wordCount() int {
