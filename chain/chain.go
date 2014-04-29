@@ -16,18 +16,6 @@ type Chain struct {
 	PrefixLen int `json:"prefix_len"`
 }
 
-// FindNode locates the node with the given key.
-// If that node doesn't already exist, then a new node will
-// be created for that key before it is returned.
-func (c *Chain) FindNode(key string) *Node {
-	for _, n := range c.Nodes {
-		if n.Key == key {
-			return n
-		}
-	}
-	return nil
-}
-
 // Build creates a new chain from newline delimited text.
 func (c *Chain) Build(r io.Reader) {
 	br := bufio.NewReader(r)
@@ -60,7 +48,7 @@ func (c *Chain) GenerateParagraph() string {
 
 	var words []string
 	for {
-		node := c.FindNode(p.key())
+		node := c.findNode(p.key())
 		if node == nil {
 			break
 		}
@@ -88,8 +76,17 @@ func (c *Chain) ToFile(path string) {
 	}
 }
 
+func (c *Chain) findNode(key string) *Node {
+	for _, n := range c.Nodes {
+		if n.Key == key {
+			return n
+		}
+	}
+	return nil
+}
+
 func (c *Chain) appendFragment(key, fragment string) {
-	node := c.FindNode(key)
+	node := c.findNode(key)
 	if node == nil {
 		node = new(Node)
 		node.Key = key
