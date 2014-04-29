@@ -90,10 +90,11 @@ func (c *Chain) GenerateParagraph() string {
 
 	var words []string
 	for {
-		choices := c.FindNode(p.key()).Fragments
-		if len(choices) == 0 {
+		node := c.FindNode(p.key())
+		if node == nil {
 			break
 		}
+		choices := node.Fragments
 		next := choices[rand.Intn(len(choices))]
 		words = append(words, next)
 		p.shift(next)

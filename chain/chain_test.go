@@ -2,6 +2,7 @@ package chain
 
 import (
 	"bytes"
+	"math/rand"
 	"reflect"
 	"testing"
 )
@@ -43,5 +44,19 @@ func TestChain(t *testing.T) {
 				t.Fatalf("%v != %v", node.Fragments, fragments)
 			}
 		}
+	}
+}
+
+// Sanity test
+func TestGenerateParagraph(t *testing.T) {
+	rand.Seed(1)
+
+	c := NewChain(2)
+	br := bytes.NewBufferString("A calorie is a calorie is a calorie.")
+	c.Build(br)
+
+	result := c.GenerateParagraph()
+	if result != "A calorie is a calorie is a calorie is a calorie." {
+		t.Fatalf("%#v", result)
 	}
 }
