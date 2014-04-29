@@ -3,12 +3,13 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/codegangsta/cli"
-	"github.com/exercism/arkov/chain"
 	"math/rand"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/codegangsta/cli"
+	"github.com/exercism/arkov/chain"
 )
 
 func main() {
