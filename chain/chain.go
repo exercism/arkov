@@ -16,10 +16,6 @@ type Chain struct {
 	PrefixLen int `json:"prefix_len"`
 }
 
-func NewChain(prefixLen int) *Chain {
-	return &Chain{[]*Node{}, prefixLen}
-}
-
 // FindNode locates the node with the given key.
 // If that node doesn't already exist, then a new node will
 // be created for that key before it is returned.
@@ -32,16 +28,7 @@ func (c *Chain) FindNode(key string) *Node {
 	return nil
 }
 
-func (c *Chain) AppendFragment(key, fragment string) {
-	node := c.FindNode(key)
-	if node == nil {
-		node = new(Node)
-		node.Key = key
-		c.Nodes = append(c.Nodes, node)
-	}
-	node.Fragments = append(node.Fragments, fragment)
-}
-
+// Build creates a new chain from newline delimited text.
 func (c *Chain) Build(r io.Reader) {
 	br := bufio.NewReader(r)
 	p := prefix(make([]string, c.PrefixLen))
@@ -51,21 +38,12 @@ func (c *Chain) Build(r io.Reader) {
 			break
 		}
 		key := p.key()
-		c.AppendFragment(key, s)
+		c.appendFragment(key, s)
 		p.shift(s)
 	}
 }
 
-func wordCount() int {
-	numbers := []int{13, 21, 34, 55, 89, 144}
-	return numbers[rand.Intn(len(numbers))]
-}
-
-func paragraphCount() int {
-	numbers := []int{1, 2, 2, 3, 3, 3, 4, 4, 5}
-	return numbers[rand.Intn(len(numbers))]
-}
-
+// Generate creates multiple paragraphs.
 func (c *Chain) Generate() string {
 	n := paragraphCount()
 	paragraphs := make([]string, n, n)
@@ -75,10 +53,7 @@ func (c *Chain) Generate() string {
 	return strings.TrimLeft(strings.Join(paragraphs, "\n\n"), "\n ")
 }
 
-func completesSentence(s string) bool {
-	return strings.LastIndexAny(s, "?!.") == len(s)-1
-}
-
+// GenerateParagraph creates a single paragraph.
 func (c *Chain) GenerateParagraph() string {
 	p := make(prefix, c.PrefixLen)
 	n := wordCount()
@@ -100,6 +75,7 @@ func (c *Chain) GenerateParagraph() string {
 	return strings.Join(words, " ")
 }
 
+// ToFile marshalls a chain to a file in JSON format.
 func (c *Chain) ToFile(path string) {
 	bytes, err := json.Marshal(c)
 	if err != nil {
@@ -112,6 +88,23 @@ func (c *Chain) ToFile(path string) {
 	}
 }
 
+func (c *Chain) appendFragment(key, fragment string) {
+	node := c.FindNode(key)
+	if node == nil {
+		node = new(Node)
+		node.Key = key
+		c.Nodes = append(c.Nodes, node)
+	}
+	node.Fragments = append(node.Fragments, fragment)
+}
+
+// NewChain creates an empty chain.
+// The prefix of each node will be prefixLen words long.
+func NewChain(prefixLen int) *Chain {
+	return &Chain{[]*Node{}, prefixLen}
+}
+
+// FromFile unmarshalls a stored JSON chain.
 func FromFile(path string) (c Chain) {
 	bytes, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -125,4 +118,18 @@ func FromFile(path string) (c Chain) {
 		return
 	}
 	return
+}
+
+func wordCount() int {
+	numbers := []int{13, 21, 34, 55, 89, 144}
+	return numbers[rand.Intn(len(numbers))]
+}
+
+func paragraphCount() int {
+	numbers := []int{1, 2, 2, 3, 3, 3, 4, 4, 5}
+	return numbers[rand.Intn(len(numbers))]
+}
+
+func completesSentence(s string) bool {
+	return strings.LastIndexAny(s, "?!.") == len(s)-1
 }
