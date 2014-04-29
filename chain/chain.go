@@ -34,10 +34,17 @@ func (c *Chain) FindNode(key string) *Node {
 			return n
 		}
 	}
-	n := new(Node)
-	n.Key = key
-	c.Nodes = append(c.Nodes, n)
-	return n
+	return nil
+}
+
+func (c *Chain) AppendFragment(key, fragment string) {
+	node := c.FindNode(key)
+	if node == nil {
+		node = new(Node)
+		node.Key = key
+		c.Nodes = append(c.Nodes, node)
+	}
+	node.Fragments = append(node.Fragments, fragment)
 }
 
 func (c *Chain) Build(r io.Reader) {
@@ -49,8 +56,7 @@ func (c *Chain) Build(r io.Reader) {
 			break
 		}
 		key := p.key()
-		node := c.FindNode(key)
-		node.Fragments = append(node.Fragments, s)
+		c.AppendFragment(key, s)
 		p.shift(s)
 	}
 }
