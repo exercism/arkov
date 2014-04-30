@@ -75,7 +75,12 @@ func (c *Chain) ToFile(path string) {
 	}
 }
 
-// findNode locates a particular node by the key.
+// findNode sifts through all the nodes in a chain, looking for a particular key.
+// This is used primarily in two contexts: building a chain, and generating output.
+// When building a chain, each new word that is encountered must be appended as a
+// possible choice following a particular key (one or more words).
+// When generating new output, each chosen word becomes the new anchoring point which
+// decides what other words may follow.
 func (c *Chain) findNode(key string) *Node {
 	for _, n := range c.Nodes {
 		if n.Key == key {
@@ -130,6 +135,9 @@ func FromFile(path string) *Chain {
 }
 
 // wordCount represents paragraph sizes of unsurprising length.
+// The paragraphs are intended to be used in fake comments, and
+// paragraphs that are somewhere in this range don't seem particularly
+// short, nor particularly long.
 func wordCount() int {
 	numbers := []int{13, 21, 34, 55, 89, 144}
 	return numbers[rand.Intn(len(numbers))]
