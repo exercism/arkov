@@ -2,6 +2,7 @@ package chain
 
 import "strings"
 
+// prefix represents the key of a Node.
 type prefix []string
 
 func (p prefix) key() string {

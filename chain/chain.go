@@ -75,6 +75,7 @@ func (c *Chain) ToFile(path string) {
 	}
 }
 
+// findNode locates a particular node by the key.
 func (c *Chain) findNode(key string) *Node {
 	for _, n := range c.Nodes {
 		if n.Key == key {
@@ -84,6 +85,7 @@ func (c *Chain) findNode(key string) *Node {
 	return nil
 }
 
+// fragments returns the possible words that may follow a key.
 func (c *Chain) fragmentsFor(key string) []string {
 	node := c.findNode(key)
 	if node == nil {
@@ -92,6 +94,7 @@ func (c *Chain) fragmentsFor(key string) []string {
 	return node.Fragments
 }
 
+// appendFragment adds a word to the list of possible choices following key.
 func (c *Chain) appendFragment(key, fragment string) {
 	node := c.findNode(key)
 	if node == nil {
@@ -126,16 +129,19 @@ func FromFile(path string) *Chain {
 	return c
 }
 
+// wordCount represents paragraph sizes of unsurprising length.
 func wordCount() int {
 	numbers := []int{13, 21, 34, 55, 89, 144}
 	return numbers[rand.Intn(len(numbers))]
 }
 
+// paragraphCount suggests a reasonable comment size.
 func paragraphCount() int {
 	numbers := []int{1, 2, 2, 3, 3, 3, 4, 4, 5}
 	return numbers[rand.Intn(len(numbers))]
 }
 
+// completesSentence determines whether or not a fragment ends with punctuation.
 func completesSentence(s string) bool {
 	return strings.LastIndexAny(s, "?!.") == len(s)-1
 }
