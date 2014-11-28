@@ -1,15 +1,12 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
 	"math/rand"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/codegangsta/cli"
-	"github.com/exercism/arkov/chain"
+	"github.com/exercism/arkov/cmd"
 )
 
 func main() {
@@ -39,21 +36,7 @@ func main() {
 					Usage: "Prefix length",
 				},
 			},
-			Action: func(c *cli.Context) {
-				markov := chain.NewChain(c.Int("prefix"))
-
-				file, err := os.Open(c.String("infile"))
-				if err != nil {
-					println(err)
-					return
-				}
-				scanner := bufio.NewScanner(file)
-				for scanner.Scan() {
-					markov.Build(strings.NewReader(scanner.Text()))
-				}
-
-				markov.ToFile(c.String("outfile"))
-			},
+			Action: cmd.Build,
 		},
 		{
 			Name:      "generate",
@@ -65,11 +48,7 @@ func main() {
 					Usage: "File containing chain data",
 				},
 			},
-			Action: func(c *cli.Context) {
-				markov := chain.FromFile(c.String("infile"))
-				text := markov.Generate()
-				fmt.Println(text)
-			},
+			Action: cmd.Generate,
 		},
 	}
 
