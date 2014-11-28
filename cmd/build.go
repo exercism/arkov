@@ -10,6 +10,7 @@ import (
 	"github.com/exercism/arkov/chain"
 )
 
+// Build creates and stores a markov datastructure.
 func Build(ctx *cli.Context) {
 	markov := chain.NewChain(ctx.Int("prefix"))
 
