@@ -25,9 +25,19 @@ func main() {
 			ShortName: "b",
 			Usage:     "build a markov chain",
 			Flags: []cli.Flag{
-				cli.StringFlag{"infile, f", "", "File containing original text"},
-				cli.StringFlag{"outfile, o", "", "File to store markov chain"},
-				cli.IntFlag{"prefix, p", 2, "Prefix length"},
+				cli.StringFlag{
+					Name:  "infile, f",
+					Usage: "File containing original text",
+				},
+				cli.StringFlag{
+					Name:  "outfile, o",
+					Usage: "File to store markov chain",
+				},
+				cli.IntFlag{
+					Name:  "prefix, p",
+					Value: 2,
+					Usage: "Prefix length",
+				},
 			},
 			Action: func(c *cli.Context) {
 				markov := chain.NewChain(c.Int("prefix"))
@@ -50,7 +60,10 @@ func main() {
 			ShortName: "g",
 			Usage:     "generate a new comment",
 			Flags: []cli.Flag{
-				cli.StringFlag{"infile, f", "", "File containing chain data"},
+				cli.StringFlag{
+					Name:  "infile, f",
+					Usage: "File containing chain data",
+				},
 			},
 			Action: func(c *cli.Context) {
 				markov := chain.FromFile(c.String("infile"))
@@ -60,5 +73,7 @@ func main() {
 		},
 	}
 
-	app.Run(os.Args)
+	if err := app.Run(os.Args); err != nil {
+		os.Exit(1)
+	}
 }
