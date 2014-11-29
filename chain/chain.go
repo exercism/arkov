@@ -56,7 +56,7 @@ func (c *Chain) GenerateParagraph() string {
 		next := choices[rand.Intn(len(choices))]
 		words = append(words, next)
 		p.shift(next)
-		if len(choices) > n && completesSentence(next) {
+		if len(choices) > n && (completesSentence(next) || len(choices) > n+10) {
 			break
 		}
 	}
