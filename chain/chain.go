@@ -149,5 +149,5 @@ func paragraphCount() int {
 
 // completesSentence determines whether or not a fragment ends with punctuation.
 func completesSentence(s string) bool {
-	return strings.LastIndexAny(s, "?!.") == len(s)-1
+	return strings.LastIndexAny(s, "?!.)") == len(s)-1
 }
