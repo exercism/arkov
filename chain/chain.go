@@ -53,10 +53,10 @@ func (c *Chain) GenerateParagraph() string {
 		if choices == nil {
 			break
 		}
-		next := choices[rand.Intn(len(choices))]
-		words = append(words, next)
-		p.shift(next)
-		if len(choices) > n && (completesSentence(next) || len(choices) > n+10) {
+		current := choices[rand.Intn(len(choices))]
+		words = append(words, current)
+		p.shift(current)
+		if len(words) > n && (completesSentence(current) || len(words) > n+500) {
 			break
 		}
 	}
