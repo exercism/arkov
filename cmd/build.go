@@ -24,5 +24,7 @@ func Build(ctx *cli.Context) {
 		markov.Build(strings.NewReader(scanner.Text()))
 	}
 
-	markov.ToFile(ctx.String("outfile"))
+	if err := markov.ToFile(ctx.String("outfile")); err != nil {
+		log.Fatal(err)
+	}
 }

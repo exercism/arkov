@@ -63,16 +63,13 @@ func (c *Chain) GenerateParagraph() string {
 }
 
 // ToFile marshalls a chain to a file in JSON format.
-func (c *Chain) ToFile(path string) {
+func (c *Chain) ToFile(path string) error {
 	bytes, err := json.Marshal(c)
 	if err != nil {
-		fmt.Printf("Failed to marshal: %v\n", err)
+		return err
 	}
 
-	err = ioutil.WriteFile(path, bytes, 0644)
-	if err != nil {
-		fmt.Printf("Unable to write to %s: %v\n", path, err)
-	}
+	return ioutil.WriteFile(path, bytes, 0644)
 }
 
 // findNode sifts through all the nodes in a chain, looking for a particular key.
@@ -117,21 +114,18 @@ func NewChain(prefixLen int) *Chain {
 }
 
 // FromFile unmarshalls a stored JSON chain.
-func FromFile(path string) *Chain {
+func FromFile(path string) (*Chain, error) {
 	bytes, err := ioutil.ReadFile(path)
 	if err != nil {
-		fmt.Printf("Unable to read file: %s\n", path)
-		return nil
+		return nil, err
 	}
 
 	c := new(Chain)
 
-	err = json.Unmarshal(bytes, c)
-	if err != nil {
-		fmt.Printf("Cannot unmarshall: %v\n", err)
-		return nil
+	if err := json.Unmarshal(bytes, c); err != nil {
+		return nil, err
 	}
-	return c
+	return c, nil
 }
 
 // wordCount represents paragraph sizes of unsurprising length.
