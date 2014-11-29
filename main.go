@@ -15,6 +15,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "exercismarkov"
 	app.Usage = "Create fake exercism nitpicks"
+	app.Version = "0.0.1"
 
 	app.Commands = []cli.Command{
 		{
