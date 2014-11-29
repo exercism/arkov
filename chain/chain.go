@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"math/rand"
+	"os"
 	"strings"
 )
 
@@ -115,6 +116,9 @@ func NewChain(prefixLen int) *Chain {
 
 // FromFile unmarshalls a stored JSON chain.
 func FromFile(path string) (*Chain, error) {
+	if _, err := os.Stat(path); err != nil {
+		return nil, err
+	}
 	bytes, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
