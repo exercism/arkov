@@ -75,7 +75,7 @@ func Seed(ctx *cli.Context) {
 			}
 			ids = append(ids, i)
 		}
-		log.Println("generating nitpicks for", len(ids), "comments")
+		log.Println("generating nitpicks for", len(ids), "comments in", language)
 
 		for _, id := range ids {
 			text := markov.Generate()
