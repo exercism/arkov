@@ -50,6 +50,18 @@ func main() {
 			},
 			Action: cmd.Generate,
 		},
+		{
+			Name:      "seed",
+			ShortName: "s",
+			Usage:     "store seeds into exercism seed database",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "dir, d",
+					Usage: "Directory containing files of chain data",
+				},
+			},
+			Action: cmd.Seed,
+		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
