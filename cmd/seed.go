@@ -7,7 +7,7 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 	"github.com/exercism/arkov/chain"
 
 	// do not expose exported names of postgresql driver,
@@ -20,14 +20,14 @@ const connInfo = `user=exercism dbname=exercism_seeds sslmode=disable`
 var errUsage = errors.New(`USAGE: arkov seed --dir=/path/to/dir/containing/json/files`)
 
 // Seed stores markov chains as comments in the exercism seed database.
-func Seed(ctx *cli.Context) {
+func Seed(ctx *cli.Context) error {
 	if ctx.String("dir") == "" {
-		log.Fatal(errUsage)
+		return errUsage
 	}
 
 	db, err := sql.Open("postgres", connInfo)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer db.Close()
 
@@ -36,20 +36,20 @@ func Seed(ctx *cli.Context) {
 	var s string
 	rows, err := db.Query(`SELECT DISTINCT(language) FROM submissions`)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		if err := rows.Scan(&s); err != nil {
-			log.Fatal(err)
+			return err
 		}
 		languages = append(languages, s)
 	}
 
 	stmt, err := db.Prepare(`UPDATE comments SET body = $1 WHERE id = $2`)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer stmt.Close()
 
@@ -64,14 +64,14 @@ func Seed(ctx *cli.Context) {
 		var ids []int
 		rows, err = db.Query(`SELECT c.id FROM comments c INNER JOIN submissions s ON c.submission_id=s.id AND s.language = $1`, language)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 		defer rows.Close()
 
 		var i int
 		for rows.Next() {
 			if err := rows.Scan(&i); err != nil {
-				log.Fatal(err)
+				return err
 			}
 			ids = append(ids, i)
 		}
@@ -81,8 +81,9 @@ func Seed(ctx *cli.Context) {
 			text := markov.Generate()
 			_, err := stmt.Exec(text, id)
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 		}
 	}
+	return nil
 }

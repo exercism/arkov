@@ -2,22 +2,20 @@ package cmd
 
 import (
 	"bufio"
-	"log"
 	"os"
 	"strings"
 
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 	"github.com/exercism/arkov/chain"
 )
 
 // Build creates and stores a markov datastructure.
-func Build(ctx *cli.Context) {
+func Build(ctx *cli.Context) error {
 	markov := chain.NewChain(ctx.Int("prefix"))
 
 	file, err := os.Open(ctx.String("infile"))
 	if err != nil {
-		log.Fatal(err)
-		return
+		return err
 	}
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -25,6 +23,7 @@ func Build(ctx *cli.Context) {
 	}
 
 	if err := markov.ToFile(ctx.String("outfile")); err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
